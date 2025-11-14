@@ -1,7 +1,7 @@
 using FluentValidation;
 using HolaMundoNet10.Application.DTOs;
 
-namespace HolaMundoNet10.Domain.Validators;
+namespace HolaMundoNet10.Application.Validators;
 
 public class FormularioValidator : AbstractValidator<FormularioRequestDto>
 {

@@ -1,5 +1,4 @@
 using HolaMundoNet10.Domain.Entities;
-using HolaMundoNet10.Domain.Validators;
 
 namespace HolaMundoNet10.Application.DTOs;
 
