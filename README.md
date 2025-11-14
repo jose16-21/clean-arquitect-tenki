@@ -136,6 +136,7 @@ curl -X POST http://localhost:8080/api/v3/formularios \
 - **Minimal APIs** - Endpoints ligeros
 - **JSON Source Generation** - Serialización optimizada
 - **Docker** - Containerización
+- **Tenki Cloud** - CI/CD Runners (30% más rápido, 90% más barato) 🚀
 
 ## 🏛️ Estructura del Proyecto
 
@@ -231,6 +232,22 @@ La aplicación expone 3 versiones arquitecturales para demostrar diferentes patr
 3. **CQRS (v3)** - `/api/v3/*` - Command Query Responsibility Segregation
 
 Se recomienda usar **v3 (CQRS)** para nuevas implementaciones.
+
+## 🚀 CI/CD con Tenki Cloud
+
+Este proyecto utiliza **Tenki Cloud** para ejecutar pipelines de CI/CD:
+
+- ⚡ **30% más rápido** que GitHub-hosted runners
+- 💰 **90% más barato** (hasta 10x menos costo)
+- 🔄 **Autoscale** automático según necesidades
+- 🎯 **$10 gratis** cada mes (~12,500 minutos)
+
+### Configuración
+Ver [TENKI_SETUP.md](./TENKI_SETUP.md) para instrucciones completas de configuración.
+
+### Workflows Disponibles
+- **CI/CD Pipeline** (`.github/workflows/ci-cd.yml`) - Build, test y Docker
+- **Tenki Test** (`.github/workflows/tenki-test.yml`) - Prueba de diferentes runners
 
 ## 📄 Licencia
 
