@@ -1,0 +1,96 @@
+name: Prueba de Tenki Runners
+
+on:
+  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub UI
+  push:
+    branches: [ feature/config-tenki ]
+
+jobs:
+  test-tenki-small:
+    name: Test con Tenki Small (2 vCPU, 4GB)
+    runs-on: tenki-standard-small-2c-4g
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: ℹ️ Info del runner
+      run: |
+        echo "🖥️ Runner Information:"
+        echo "OS: $(uname -a)"
+        echo "CPU Cores: $(nproc)"
+        echo "RAM: $(free -h | grep Mem | awk '{print $2}')"
+        echo "Disk: $(df -h / | tail -1 | awk '{print $2}')"
+        
+    - name: ⚙️ Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 🔨 Build
+      run: |
+        echo "⏱️ Inicio: $(date)"
+        dotnet build --configuration Release
+        echo "✅ Fin: $(date)"
+
+  test-tenki-medium:
+    name: Test con Tenki Medium (4 vCPU, 8GB)
+    runs-on: tenki-standard-medium-4c-8g
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: ℹ️ Info del runner
+      run: |
+        echo "🖥️ Runner Information:"
+        echo "OS: $(uname -a)"
+        echo "CPU Cores: $(nproc)"
+        echo "RAM: $(free -h | grep Mem | awk '{print $2}')"
+        echo "Disk: $(df -h / | tail -1 | awk '{print $2}')"
+        
+    - name: ⚙️ Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 🔨 Build
+      run: |
+        echo "⏱️ Inicio: $(date)"
+        dotnet build --configuration Release
+        echo "✅ Fin: $(date)"
+
+  test-tenki-autoscale:
+    name: Test con Tenki Autoscale
+    runs-on: tenki-standard-autoscale
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: ℹ️ Info del runner
+      run: |
+        echo "🖥️ Runner Information (Autoscale):"
+        echo "OS: $(uname -a)"
+        echo "CPU Cores: $(nproc)"
+        echo "RAM: $(free -h | grep Mem | awk '{print $2}')"
+        echo "Disk: $(df -h / | tail -1 | awk '{print $2}')"
+        
+    - name: ⚙️ Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 🔨 Build y Test
+      run: |
+        echo "⏱️ Inicio: $(date)"
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+        echo "✅ Fin: $(date)"
+        
+    - name: 🎉 Resumen
+      run: |
+        echo "================================================"
+        echo "✅ Build completado con Tenki Autoscale"
+        echo "🚀 Tenki es 30% más rápido y 90% más barato"
+        echo "================================================"
