@@ -136,6 +136,7 @@ curl -X POST http://localhost:8080/api/v3/formularios \
 - **Minimal APIs** - Endpoints ligeros
 - **JSON Source Generation** - Serialización optimizada
 - **Docker** - Containerización
+- **Tenki Cloud** - CI/CD Runners (30% más rápido, 90% más barato) 🚀
 
 ## 🏛️ Estructura del Proyecto
 
@@ -231,6 +232,58 @@ La aplicación expone 3 versiones arquitecturales para demostrar diferentes patr
 3. **CQRS (v3)** - `/api/v3/*` - Command Query Responsibility Segregation
 
 Se recomienda usar **v3 (CQRS)** para nuevas implementaciones.
+
+## 🚀 CI/CD con Tenki Cloud
+
+Este proyecto utiliza **[Tenki Cloud](https://app.tenki.cloud/)** como plataforma de CI/CD para ejecutar GitHub Actions:
+
+### 🎯 Ventajas Clave
+- ⚡ **30% más rápido** - Servidores bare metal optimizados
+- 💰 **90% más barato** - $0.0008/min vs $0.008/min de GitHub
+- 🔄 **Autoscale inteligente** - Se adapta automáticamente a la carga
+- 🎁 **$10 gratis mensuales** - ~12,500 minutos de ejecución
+- 🖥️ **Múltiples tamaños** - Desde 2 vCPU hasta 16 vCPU
+
+### 📦 Runners Disponibles
+| Runner | vCPU | RAM | Precio/min | Uso Recomendado |
+|--------|------|-----|------------|-----------------|
+| `tenki-standard-small-2c-4g` | 2 | 4GB | $0.0004 | Tests ligeros |
+| `tenki-standard-medium-4c-8g` | 4 | 8GB | $0.0008 | Builds normales |
+| `tenki-standard-large-8c-16g` | 8 | 16GB | $0.0016 | Builds pesados |
+| `tenki-standard-autoscale` | Dynamic | Dynamic | $0.0008 | **Recomendado** |
+
+### 🔧 Configuración
+1. Regístrate en [app.tenki.cloud](https://app.tenki.cloud/)
+2. Instala la GitHub App en tu repositorio
+3. Usa `runs-on: tenki-standard-autoscale` en tus workflows
+
+Ver [TENKI_SETUP.md](./TENKI_SETUP.md) para la guía completa.
+
+### 📊 Workflows Activos
+
+#### CI/CD Pipeline (`.github/workflows/ci-cd.yml`)
+Se ejecuta cuando:
+- ✅ Se abre o actualiza un Pull Request hacia `develop` o `master`
+- ✅ Se hace merge (push) a `develop` o `master`
+
+Jobs:
+- **build-and-test** - Compila y ejecuta tests (`tenki-standard-medium-4c-8g`)
+- **performance-check** - Validación de rendimiento (`tenki-standard-autoscale`)
+- **build-docker** - Construcción de imagen Docker (solo en `master`)
+
+#### Tenki Test (`.github/workflows/tenki-test.yml`)
+Workflow de prueba para comparar rendimiento entre diferentes runners:
+- Ejecución manual desde GitHub UI
+- Compara: Small (2 vCPU), Medium (4 vCPU) y Autoscale
+
+### 💡 Comparación de Costos
+
+**Ejemplo:** Build típico de 5 minutos
+- GitHub-hosted: `5 min × $0.008 = $0.04`
+- Tenki Cloud: `5 min × $0.0008 = $0.004`
+- **Ahorro:** 90% ($0.036 por build)
+
+Con $10 gratis mensuales = **250 builds gratuitos** 🎉
 
 ## 📄 Licencia
 

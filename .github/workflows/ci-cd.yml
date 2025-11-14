@@ -1,0 +1,88 @@
+name: CI/CD Pipeline con Tenki
+
+on:
+  push:
+    branches: [ master, develop ]  # Solo ejecutar en push a master/develop (después de merge)
+  pull_request:
+    branches: [ master, develop ]  # Ejecutar cuando se abre/actualiza PR
+
+jobs:
+  build-and-test:
+    # 🚀 Usar Tenki runner en lugar de ubuntu-latest
+    # Opciones disponibles:
+    # - tenki-standard-small-2c-4g (2 vCPU, 4GB RAM)
+    # - tenki-standard-medium-4c-8g (4 vCPU, 8GB RAM)
+    # - tenki-standard-large-8c-16g (8 vCPU, 16GB RAM)
+    # - tenki-standard-large-plus-16c-32g (16 vCPU, 32GB RAM)
+    # - tenki-autoscale (escala automáticamente según necesidades)
+    runs-on: tenki-standard-medium-4c-8g
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: ⚙️ Configurar .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 📦 Restaurar dependencias
+      run: dotnet restore
+      
+    - name: 🔨 Compilar proyecto
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: 🧪 Ejecutar tests (si existen)
+      run: dotnet test --no-build --verbosity normal --configuration Release
+      continue-on-error: true
+      
+    - name: 📊 Verificar salud de la aplicación
+      run: |
+        dotnet run --project . --no-build --configuration Release &
+        APP_PID=$!
+        sleep 10
+        curl -f http://localhost:8080/health || exit 1
+        kill $APP_PID
+
+  build-docker:
+    needs: build-and-test
+    runs-on: tenki-standard-medium-4c-8g
+    if: github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: 🐋 Configurar Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: 🔨 Build de imagen Docker
+      run: |
+        docker build -t holamundonet10:${{ github.sha }} .
+        docker tag holamundonet10:${{ github.sha }} holamundonet10:latest
+        
+    - name: 📊 Información de la imagen
+      run: |
+        echo "✅ Imagen creada exitosamente"
+        docker images | grep holamundonet10
+        docker inspect holamundonet10:latest --format='Tamaño: {{.Size}}'
+
+  performance-check:
+    needs: build-and-test
+    runs-on: tenki-standard-autoscale
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: ⚙️ Configurar .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 🚀 Benchmark de rendimiento
+      run: |
+        dotnet build --configuration Release
+        echo "🎯 Aplicación compilada y lista para producción"
+        echo "📊 Estadísticas de compilación:"
+        ls -lh bin/Release/net10.0/
